@@ -1,5 +1,5 @@
-filename = "input.txt"
-# filename = "example.txt" 
+# filename = "data/01_e.txt"
+filename = "data/01_i.txt"
 
 import heapq
 
@@ -17,4 +17,5 @@ with open(filename, "r") as file:
 
     heapq.heappushpop(top, temp)
 
+print(top[0])
 print(sum(top))
