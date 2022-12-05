@@ -11,7 +11,6 @@ with open(filename, 'r') as f:
         for i in range(num_stacks):
             level.append(line[4*i:4*i+3])
         levels.append(level)
-
         line = f.readline()
 
     levels = levels[:-1]
@@ -20,6 +19,8 @@ with open(filename, 'r') as f:
         for i, stack in enumerate(level):
             if stack != '   ':
                 stacks[i].append(stack[1])
+    import copy
+    stacks_9001 = copy.deepcopy(stacks) 
 
     moves = f.read().splitlines()
     moves = [move.split(' ') for move in moves]
@@ -31,3 +32,10 @@ with open(filename, 'r') as f:
 
     print(''.join([stack[-1] for stack in stacks]))
 
+    for move in moves:
+        temp = []
+        for _ in range(0, move[0]):
+            temp.append(stacks_9001[move[1]-1].pop())
+        stacks_9001[move[2]-1].extend(temp[::-1]) 
+
+    print(''.join([stack[-1] for stack in stacks_9001]))
