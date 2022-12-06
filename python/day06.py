@@ -13,44 +13,36 @@ def stream_start(seq: str, marker_len: int) -> int:
 class Examples(unittest.TestCase):
     START_PKT_LEN = 4
     START_MSG_LEN = 14
+    seq_list = [
+        'mjqjpqmgbljsphdztnvjfqwrcgsmlb', 'bvwbjplbgvbhsrlpgdmjqwftvncz',
+        'nppdvjthqldpwncqszvftbrmjlhg', 'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg',
+        'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'
+    ]
+
+    def setUp(self):
+        filename = 'data/06_i.txt'
+        with open(filename, 'r') as f:
+            self.seq = f.read()
 
     def test_partA_examples(self):
-        seq_list = [
-            'mjqjpqmgbljsphdztnvjfqwrcgsmlb', 'bvwbjplbgvbhsrlpgdmjqwftvncz',
-            'nppdvjthqldpwncqszvftbrmjlhg',
-            'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg',
-            'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'
-        ]
-
         res_list = [7, 5, 6, 10, 11]
         self.assertListEqual(
-            list(map(lambda x: stream_start(x, self.START_PKT_LEN), seq_list)),
-            res_list)
+            list(
+                map(lambda x: stream_start(x, self.START_PKT_LEN),
+                    self.seq_list)), res_list)
 
     def test_partA(self):
-        filename = 'data/06_i.txt'
-        with open(filename, 'r') as f:
-            seq = f.read()
-        self.assertEqual(stream_start(seq, self.START_PKT_LEN), 1794)
+        self.assertEqual(stream_start(self.seq, self.START_PKT_LEN), 1794)
 
     def test_partB_examples(self):
-        seq_list = [
-            'mjqjpqmgbljsphdztnvjfqwrcgsmlb', 'bvwbjplbgvbhsrlpgdmjqwftvncz',
-            'nppdvjthqldpwncqszvftbrmjlhg',
-            'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg',
-            'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'
-        ]
-
         res_list = [19, 23, 23, 29, 26]
         self.assertListEqual(
-            list(map(lambda x: stream_start(x, self.START_MSG_LEN), seq_list)),
-            res_list)
+            list(
+                map(lambda x: stream_start(x, self.START_MSG_LEN),
+                    self.seq_list)), res_list)
 
     def test_partB(self):
-        filename = 'data/06_i.txt'
-        with open(filename, 'r') as f:
-            seq = f.read()
-        self.assertEqual(stream_start(seq, self.START_MSG_LEN), 2851)
+        self.assertEqual(stream_start(self.seq, self.START_MSG_LEN), 2851)
 
 
 if __name__ == '__main__':
