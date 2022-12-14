@@ -21,6 +21,29 @@ def get_visible_trees(grid):
     return visible
 
 
+def get_max_score(grid):
+    M, N = grid.shape
+
+    def num_trees(val, line):
+        line = np.atleast_1d(line)
+        for i, x in np.ndenumerate(line):
+            if x >= val:
+                return i[0] + 1
+
+        return line.size
+
+    max_score = 0
+    for m in range(1, M - 1):
+        for n in range(1, N - 1):
+            val = grid[m, n]
+            score = num_trees(val, np.flip(grid[:m, n])) * num_trees(
+                val, grid[m + 1:, n]) * num_trees(val, np.flip(
+                    grid[m, :n])) * num_trees(val, grid[m, n + 1:])
+            max_score = max(max_score, score)
+
+    return max_score
+
+
 class Tests(unittest.TestCase):
 
     def setUp(self):
@@ -47,6 +70,12 @@ class Tests(unittest.TestCase):
 
     def test_part1(self):
         self.assertEqual(1703, get_visible_trees(self.data))
+
+    def test_part2_example(self):
+        self.assertEqual(8, get_max_score(self.data_example))
+
+    def test_part2(self):
+        self.assertEqual(8, get_max_score(self.data))
 
 
 if __name__ == '__main__':
