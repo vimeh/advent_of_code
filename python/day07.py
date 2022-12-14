@@ -1,65 +1,41 @@
 import unittest
+import re
 
 
 def dir_sizes(stream):
-    stack = []
-    res = {}
-
-    cwd, usize = '', 0
-    for line in stream[1:]:
-        line = line.split()
-
-        # options
-        if line[0] == '$':
-            if line[1] == 'cd':
-                # cd
-                if line[2] == '..':
-                    path = '/'.join([x[0] for x in stack]) + '/' + cwd
-                    res[path] = usize
-                    parent = stack.pop()
-                    cwd = parent[0]
-                    usize += parent[1]
-                else:
-                    # cd dir
-                    stack.append((cwd, usize))
-                    cwd, usize = line[2], 0
-            else:
-                # ls -- ignore
-                continue
-        else:
-            if line[0] == 'dir':
-                # dir name
-                continue
-            else:
-                # file, usize
-                usize += int(line[0])
+    stack = [0]
+    res = []
 
     while stack:
-        path = '/'.join([x[0] for x in stack]) + '/' + cwd
-        res[path] = usize
-        parent = stack.pop()
-        cwd = parent[0]
-        usize += parent[1]
-    path = '/'.join([x[0] for x in stack]) + '/' + cwd
-    res[path] = usize
+        line = next(stream, "$ cd ..")
+
+        if line == '$ cd ..':
+            usize = stack.pop()
+            if stack:
+                res.append(usize)
+                stack[-1] += usize
+        elif cd := re.match(r"\$ cd .+", line):
+            stack.append(0)
+        elif file := re.match(r"(\d+) .+", line):
+            stack[-1] += int(file.group(1))
 
     return res
 
 
 def sum_dir_lt(stream, limit):
     res = dir_sizes(stream)
-    res = [(k, v) for k, v in res.items() if v < limit]
+    res = [x for x in res if x < limit]
 
-    return sum([x[1] for x in res])
+    return sum(res)
 
 
 def min_delete(stream, tot, need):
     res = dir_sizes(stream)
-    res = sorted(res.items(), key=lambda x: x[1])
+    res = sorted(res)
 
-    free = tot - res[-1][1]
+    free = tot - res[-1]
     need -= free
-    for _, v in res:
+    for v in res:
         if v > need:
             return v
 
@@ -72,11 +48,11 @@ class Tests(unittest.TestCase):
     def setUp(self) -> None:
         filename = "data/07_e.txt"
         with open(filename, 'r') as f:
-            self.data_example = f.read().splitlines()
+            self.data_example = iter(f.read().splitlines())
 
         filename = "data/07_i.txt"
         with open(filename, 'r') as f:
-            self.data = f.read().splitlines()
+            self.data = iter(f.read().splitlines())
 
     def test_part1_example(self):
         res = 95437
