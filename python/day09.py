@@ -12,31 +12,38 @@ def pos_visited(data, len_tail):
     for move in data:
         d, s = move[0], int(move[1])
         for j in range(s):
-            # move the head
+            # shift the head
             diff = moves[d]
             prev = rope[0]
             rope[0] = tuple(x + y for x, y in zip(prev, diff))
 
             # check the following nodes
             for i in range(1, len(rope)):
+                # check if need to shift
                 if any(abs(p - n) > 1 for p, n in zip(rope[i - 1], rope[i])):
+                    # not on shared axis
                     if sum(abs(p - n)
                            for p, n in zip(rope[i - 1], rope[i])) == 3:
+                        # prev node shifted along an axis
                         if diff in moves.values():
                             prev, rope[i] = rope[i], prev
+                        # prev node shifted along a diagonal
                         else:
                             prev, rope[i] = rope[i], tuple(
                                 x + y for x, y in zip(rope[i], diff))
+                    # on shared axis
                     else:
+                        # move node over by 1 in direction of previous node
                         direction = tuple(
                             (x - y) // 2 for x, y in zip(rope[i - 1], rope[i]))
                         prev, rope[i] = rope[i], tuple(
                             x + y for x, y in zip(rope[i], direction))
-                        # prev, rope[i] = rope[i], tuple(
-                        # x + y for x, y in zip(rope[i], moves[d]))
 
+                # always calculate how this node moves
                 diff = tuple(x - y for x, y in zip(rope[i], prev))
-            if (DEBUG) and move == ['L', '8']:
+
+            # print after single shift
+            if (DEBUG):
                 print(f'== {move} == {j}')
                 for i in range(-14, 14):
                     for j in range(-14, 14):
@@ -48,9 +55,10 @@ def pos_visited(data, len_tail):
                             print('.', end='')
                     print('')
 
-            # at end of move, add tail to visited
+            # at end of shift, add tail to visited
             visited.add(rope[-1])
 
+        # print state after every move
         if (DEBUG):
             print(f'== {move} ==')
             for i in range(-14, 14):
