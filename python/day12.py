@@ -11,7 +11,7 @@ def parse_input(data):
         for j, elev in enumerate(line):
             row.append(ord(elev) - ord('a'))
             if row[-1] == (ord('S') - ord('a')):
-                row[-1] = 1024
+                row[-1] = ord('a') - ord('a')
                 S = (i, j)
             elif row[-1] == (ord('E') - ord('a')):
                 row[-1] = (ord('z') - ord('a'))
@@ -31,15 +31,14 @@ def get_valid_neighbors(curr, grid):
                 yield (curr[0] + dm, curr[1] + dn)
 
 
-def find_path(data):
-    grid, S, E = parse_input(data)
+def find_path(grid, S, E):
 
-    queue = deque()
-    curr = S
-    seen = set([S])
-    path = []
+    queue = deque([(S, [])])
+    seen = set()
+    curr = None
 
-    while curr != E:
+    while curr != E and queue:
+        curr, path = queue.popleft()
         path.append(curr)
 
         valid_neighbors = get_valid_neighbors(curr, grid)
@@ -48,9 +47,31 @@ def find_path(data):
                 queue.append(((nm, nn), path.copy()))
                 seen.add((nm, nn))
 
-        curr, path = queue.popleft()
+    if curr == E:
+        return len(path) - 1
+    else:
+        return 2**10
 
-    return len(path)
+
+def find_best_path(data, all_starts=False):
+    grid, S, E = parse_input(data)
+
+    if all_starts:
+        starts = []
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 0:
+                    starts.append((i, j))
+    else:
+        starts = [S]
+
+    best_path = None
+    for start in starts:
+        path = find_path(grid, start, E)
+        if best_path is None or path < best_path:
+            best_path = path
+
+    return best_path
 
 
 class Solution(unittest.TestCase):
@@ -67,10 +88,16 @@ class Solution(unittest.TestCase):
         self.data = data
 
     def test_part1_example(self):
-        self.assertEqual(31, find_path(self.data_example))
+        self.assertEqual(31, find_best_path(self.data_example))
 
     def test_part1(self):
-        self.assertEqual(394, find_path(self.data))
+        self.assertEqual(394, find_best_path(self.data))
+
+    def test_part2_example(self):
+        self.assertEqual(29, find_best_path(self.data_example, True))
+
+    def test_part2(self):
+        self.assertEqual(388, find_best_path(self.data, True))
 
 
 if __name__ == '__main__':
