@@ -21,34 +21,32 @@ def parse_input(data):
     return grid, S, E
 
 
-def get_valid_neighbors(curr, grid):
+def get_valid_neighbors(curr, grid, seen):
     M, N = len(grid), len(grid[0])
     dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
     for dm, dn in dirs:
         if 0 <= curr[0] + dm < M and 0 <= curr[1] + dn < N:
-            if grid[curr[0] + dm][curr[1] + dn] <= grid[curr[0]][curr[1]] + 1:
-                yield (curr[0] + dm, curr[1] + dn)
+            m, n = curr[0] + dm, curr[1] + dn
+            if grid[m][n] <= grid[curr[0]][curr[1]] + 1:
+                if (m, n) not in seen:
+                    yield (m, n)
 
 
 def find_path(grid, S, E):
-
-    queue = deque([(S, [])])
+    queue = deque([(S, 0)])
     seen = set()
-    curr = None
+    curr, dist = None, 0
 
     while curr != E and queue:
-        curr, path = queue.popleft()
-        path.append(curr)
+        curr, dist = queue.popleft()
 
-        valid_neighbors = get_valid_neighbors(curr, grid)
-        for nm, nn in valid_neighbors:
-            if (nm, nn) not in seen:
-                queue.append(((nm, nn), path.copy()))
-                seen.add((nm, nn))
+        for nm, nn in get_valid_neighbors(curr, grid, seen):
+            queue.append(((nm, nn), dist + 1))
+            seen.add((nm, nn))
 
     if curr == E:
-        return len(path) - 1
+        return dist
     else:
         return 2**10
 
