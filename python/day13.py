@@ -2,28 +2,33 @@ import unittest
 
 
 def is_correct_order(lt, rt):
-    print(lt, rt)
     if type(lt) == int:
-        if type(rt) == int:
-            return lt <= rt
-        elif type(rt) == list:
-            return is_correct_order([lt], rt)
-    elif type(lt) == list:
-        if type(rt) == int:
-            return is_correct_order(lt, [rt])
-        elif type(rt) == list:
-            if len(lt) == 0:
+        return is_correct_order([lt], rt)
+
+    if type(rt) == int:
+        return is_correct_order(lt, [rt])
+
+    if len(lt) == 0:
+        return True
+    elif len(rt) == 0:
+        return False
+
+    if type(lt[0]) == int:
+        if type(rt[0]) == int:
+            if lt[0] < rt[0]:
                 return True
-            elif len(rt) == 0:
+            elif lt[0] == rt[0]:
+                return is_correct_order(lt[1:], rt[1:])
+            else:
                 return False
-            elif is_correct_order(lt[0], rt[0]):
-                if type(lt[0]) == int and type(rt[0]) == int:
-                    if lt[0] < rt[0]:
-                        return True
-                    else:
-                        return is_correct_order(lt[1:], rt[1:])
-                else:
-                    return is_correct_order(lt[1:], rt[1:])
+        else:
+            return is_correct_order(lt[0], rt[0])
+    elif type(lt[0]) == list:
+        if type(rt[0]) == int:
+            return is_correct_order(lt[0], rt[0])
+        else:
+            if is_correct_order(lt[0], rt[0]):
+                return is_correct_order(lt[1:], rt[1:])
 
 
 def sum_correct_order(data):
@@ -53,7 +58,7 @@ class Solution(unittest.TestCase):
     def test_part1_example(self):
         self.assertEqual(13, sum_correct_order(self.data_ex))
 
-    def rtest_part1(self):
+    def test_part1(self):
         self.assertEqual(13, sum_correct_order(self.data))
 
 
